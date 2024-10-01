@@ -16,9 +16,8 @@ app.use(
     credentials: true,
     origin: [
       "http://localhost:3000",
-      "https://poostatoes.vercel.app",
-      "https://poostatoes.vercel.app/",
-      "https://poostatoes-api.vercel.app",
+      "https://poostack.vercel.app",
+      "https://poostack.vercel.app/",
     ],
   })
 );
