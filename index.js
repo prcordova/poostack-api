@@ -18,6 +18,8 @@ app.use(
       "http://localhost:3000",
       "https://poostack.vercel.app",
       "https://poostack.vercel.app/",
+      "https://poostack-proclabs.vercel.app/",
+      "https://poostack-proclabs.vercel.app",
     ],
   })
 );
