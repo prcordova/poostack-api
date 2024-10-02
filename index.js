@@ -14,13 +14,20 @@ require("dotenv").config();
 app.use(
   cors({
     credentials: true,
-    origin: [
-      "http://localhost:3000",
-      "https://poostack.vercel.app",
-      "https://poostack.vercel.app/",
-      "https://poostack-proclabs.vercel.app/",
-      "https://poostack-proclabs.vercel.app",
-    ],
+    origin: (origin, callback) => {
+      if (
+        origin &&
+        [
+          "http://localhost:3000",
+          "https://poostack.vercel.app",
+          "https://poostack-proclabs.vercel.app",
+        ].includes(origin)
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
   })
 );
 
