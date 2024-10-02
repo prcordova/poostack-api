@@ -14,20 +14,11 @@ require("dotenv").config();
 app.use(
   cors({
     credentials: true,
-    origin: (origin, callback) => {
-      if (
-        origin &&
-        [
-          "http://localhost:3000",
-          "https://poostack.vercel.app",
-          "https://poostack-proclabs.vercel.app",
-        ].includes(origin)
-      ) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: [
+      "http://localhost:3000",
+      "https://poostack.vercel.app",
+      "https://poostack-proclabs.vercel.app",
+    ],
   })
 );
 
@@ -120,10 +111,18 @@ app.post("/post", uploadMiddleware.single("file"), async (req, res) => {
   const { originalname, path: tempPath } = req.file;
   const parts = originalname.split(".");
   const ext = parts[parts.length - 1];
-  const filename = tempPath.split("/").pop() + "." + ext;
-  const newPath = path.join(__dirname, "uploads", filename);
 
-  fs.renameSync(tempPath, newPath);
+  // Usar basename para obter o nome do arquivo sem o caminho absoluto
+  const filename = path.basename(tempPath) + "." + ext;
+  const newPath = path.join(__dirname, "uploads", filename); // Construir o caminho correto
+
+  // Mover o arquivo para o novo caminho
+  try {
+    fs.renameSync(tempPath, newPath);
+  } catch (error) {
+    console.error("Erro ao mover o arquivo:", error);
+    return res.status(500).json({ message: "Erro ao mover o arquivo" });
+  }
 
   // Define 'cover' como caminho relativo
   const cover = `uploads/${filename}`;
@@ -140,15 +139,21 @@ app.post("/post", uploadMiddleware.single("file"), async (req, res) => {
       console.error(err);
       return res.status(401).json({ error: "Invalid token" });
     }
+
     const { title, summary, content } = req.body;
-    const postDoc = await Post.create({
-      title,
-      summary,
-      content,
-      cover, // Usa o caminho relativo
-      author: info.id,
-    });
-    res.status(200).json(postDoc);
+    try {
+      const postDoc = await Post.create({
+        title,
+        summary,
+        content,
+        cover, // Usa o caminho relativo
+        author: info.id,
+      });
+      res.status(200).json(postDoc);
+    } catch (error) {
+      console.error("Erro ao criar post:", error);
+      res.status(500).json({ message: "Erro ao criar post" });
+    }
   });
 });
 
