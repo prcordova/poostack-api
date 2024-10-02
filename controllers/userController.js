@@ -198,8 +198,8 @@ exports.logout = (req, res) => {
 };
 
 exports.updateProfile = async (req, res) => {
-  const { id } = req.user; // Pega o ID do usuário logado via token JWT
-  const { username, bio, avatarUrl, backgroundUrl } = req.body;
+  const { id } = req.params; // O ID do usuário agora vem da URL
+  const { username, bio } = req.body;
 
   try {
     const user = await User.findById(id);
@@ -207,11 +207,14 @@ exports.updateProfile = async (req, res) => {
       return res.status(404).json({ message: "Usuário não encontrado" });
     }
 
-    // Atualizando informações
+    // Atualizando as informações de texto
     user.username = username || user.username;
     user.bio = bio || user.bio;
-    user.avatarUrl = avatarUrl || user.avatarUrl;
-    user.backgroundUrl = backgroundUrl || user.backgroundUrl;
+
+    // Verificando se um arquivo foi enviado (avatar ou background)
+    if (req.file) {
+      user.avatarUrl = `/uploads/${req.file.filename}`; // Salva o caminho do avatar
+    }
 
     await user.save();
     res.status(200).json({ message: "Perfil atualizado com sucesso", user });

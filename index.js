@@ -7,9 +7,13 @@ require("dotenv").config();
 
 const userRoutes = require("./routes/users");
 const postRoutes = require("./routes/posts");
-const friendRoutes = require("./routes/friends"); // Adicionando as rotas de amizade
+const friendRoutes = require("./routes/friends");
 
 const app = express();
+
+// Aumentar o limite de tamanho do payload
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 app.use(
   cors({
@@ -19,7 +23,6 @@ app.use(
   })
 );
 
-app.use(express.json());
 app.use(cookieParser());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -28,10 +31,9 @@ mongoose.connect(process.env.MONGODB_KEY, {
   useUnifiedTopology: true,
 });
 
-// Usar rotas específicas
 app.use("/api", userRoutes);
 app.use("/api", postRoutes);
-app.use("/api", friendRoutes); // Usar as rotas de amizade
+app.use("/api", friendRoutes);
 
 app.listen(8080, () => {
   console.log("Servidor rodando na porta 8080");
