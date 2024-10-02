@@ -15,8 +15,9 @@ const {
   removeFriend, // Certifique-se de que isso esteja aqui
   checkFriendStatus, // Certifique-se de que isso também esteja aqui
 } = require("../controllers/userController");
-
 const router = express.Router();
+const { verifyToken } = require("../middleware/auth");
+router.put("/users/update", verifyToken, updateProfile);
 
 router.post("/register", register);
 router.post("/login", login);

@@ -198,11 +198,11 @@ exports.logout = (req, res) => {
 };
 
 exports.updateProfile = async (req, res) => {
-  const { userId } = req.user; // Pegar ID do usuário logado (via token JWT)
+  const { id } = req.user; // Pega o ID do usuário logado via token JWT
   const { username, bio, avatarUrl, backgroundUrl } = req.body;
 
   try {
-    const user = await User.findById(userId);
+    const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({ message: "Usuário não encontrado" });
     }
