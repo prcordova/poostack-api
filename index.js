@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 require("dotenv").config();
+
 const userRoutes = require("./routes/users");
 const postRoutes = require("./routes/posts");
 const friendRoutes = require("./routes/friends");
@@ -25,15 +26,20 @@ app.use(
 app.use(cookieParser());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// Conectando ao MongoDB
 mongoose.connect(process.env.MONGODB_KEY, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
+// Configurando rotas
 app.use("/api", userRoutes);
 app.use("/api", postRoutes);
 app.use("/api", friendRoutes);
 
-app.listen(8080, () => {
-  console.log("Servidor rodando na porta 8080");
+// Definindo a porta, utilizando a variável de ambiente PORT fornecida pelo Back4App ou a porta 8080 como fallback
+const port = process.env.PORT || 8080;
+
+app.listen(port, () => {
+  console.log(`Servidor rodando na porta ${port}`);
 });
