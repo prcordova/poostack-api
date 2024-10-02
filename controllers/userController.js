@@ -5,13 +5,28 @@ const jwt = require("jsonwebtoken");
 const secret = process.env.JWT_SECRET;
 exports.searchUser = async (req, res) => {
   const { username } = req.query;
+  console.log("Query recebida:", username); // Verificar se a query foi recebida corretamente
+
+  if (!username || username.length < 3) {
+    return res
+      .status(400)
+      .json({ message: "A busca deve conter ao menos 3 caracteres." });
+  }
+
   try {
     const users = await User.find(
-      { username: new RegExp(username, "i") },
+      { username: new RegExp(username, "i") }, // Busca case insensitive
       "_id username"
     );
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({ message: "Nenhum usuário encontrado." });
+    }
+
+    console.log("Usuários encontrados:", users); // Verificar se os usuários foram encontrados
     res.status(200).json(users);
   } catch (error) {
+    console.error("Erro ao buscar usuários:", error);
     res.status(500).json({ message: "Erro ao buscar usuários" });
   }
 };
@@ -187,7 +202,20 @@ exports.getUserById = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "Usuário não encontrado" });
     }
-    res.status(200).json(user);
+
+    // Retorna o perfil do usuário com avatar e background URLs
+    res.status(200).json({
+      id: user._id,
+      username: user.username,
+      avatarUrl: user.avatarUrl ? `${API_BASE_URL}${user.avatarUrl}` : null, // Gera a URL completa do avatar
+      backgroundUrl: user.backgroundUrl
+        ? `${API_BASE_URL}${user.backgroundUrl}`
+        : null, // Gera a URL completa do background
+      bio: user.bio,
+      friends: user.friends,
+      pendingRequests: user.pendingRequests,
+      sentRequests: user.sentRequests,
+    });
   } catch (error) {
     res.status(500).json({ message: "Erro ao buscar o usuário" });
   }
@@ -198,7 +226,7 @@ exports.logout = (req, res) => {
 };
 
 exports.updateProfile = async (req, res) => {
-  const { id } = req.params; // O ID do usuário agora vem da URL
+  const { id } = req.params;
   const { username, bio } = req.body;
 
   try {
@@ -207,16 +235,23 @@ exports.updateProfile = async (req, res) => {
       return res.status(404).json({ message: "Usuário não encontrado" });
     }
 
-    // Atualizando as informações de texto
+    // Atualizando campos de texto
     user.username = username || user.username;
     user.bio = bio || user.bio;
 
-    // Verificando se um arquivo foi enviado (avatar ou background)
-    if (req.file) {
-      user.avatarUrl = `/uploads/${req.file.filename}`; // Salva o caminho do avatar
+    // Atualizando o avatar e background se forem enviados
+    if (req.files) {
+      if (req.files.avatar) {
+        user.avatarUrl = `/uploads/${req.files.avatar[0].filename}`;
+      }
+      if (req.files.background) {
+        user.backgroundUrl = `/uploads/${req.files.background[0].filename}`;
+      }
     }
 
     await user.save();
+
+    // Retornar o usuário atualizado
     res.status(200).json({ message: "Perfil atualizado com sucesso", user });
   } catch (error) {
     res.status(500).json({ message: "Erro ao atualizar perfil", error });

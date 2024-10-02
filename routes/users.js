@@ -1,4 +1,5 @@
 const express = require("express");
+const uploadFields = require("../middleware/uploadFields");
 const {
   register,
   login,
@@ -40,18 +41,21 @@ router.post("/login", login);
 router.get("/profile", getProfile);
 router.post("/logout", logout);
 
+// **Coloque a rota de busca antes da rota com parâmetro dinâmico**
+router.get("/users/search", searchUser); // Esta rota deve vir antes do "/users/:id"
+
 // Rota para atualizar o perfil (incluindo avatar e background)
 router.put(
   "/users/update/:id", // A rota agora espera o ID do usuário na URL
   verifyToken,
-  upload.single("file"), // Aceita o upload de avatar ou background
-  updateProfile
+  uploadFields, // Middleware para lidar com múltiplos arquivos
+  updateProfile // Função de controle para atualizar o perfil
 );
 
 router.post("/users/friend-request", sendFriendRequest);
 router.post("/users/accept-friend", acceptFriendRequest);
 router.post("/users/remove-friend", removeFriend);
 router.get("/users/friend-status", checkFriendStatus);
-router.get("/users/:id", getUserById);
+router.get("/users/:id", getUserById); // Rota para buscar o usuário por ID
 
 module.exports = router;

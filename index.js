@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 require("dotenv").config();
-
 const userRoutes = require("./routes/users");
 const postRoutes = require("./routes/posts");
 const friendRoutes = require("./routes/friends");
