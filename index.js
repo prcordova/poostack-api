@@ -38,8 +38,8 @@ app.use("/api", postRoutes);
 app.use("/api", friendRoutes);
 
 // Definindo a porta, utilizando a variável de ambiente PORT fornecida pelo Back4App ou a porta 8080 como fallback
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 8080;
 
-app.listen(port || 8080, () => {
+app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
 });
