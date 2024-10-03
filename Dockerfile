@@ -15,6 +15,7 @@ COPY . .
 
 # Exponha a porta que a aplicação usará
 EXPOSE 8080
+EXPOSE 4000
 
 # Defina uma variável de ambiente (opcional, dependendo da sua aplicação)
 ENV NODE_ENV=production
