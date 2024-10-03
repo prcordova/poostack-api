@@ -9,14 +9,13 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Instale as dependências do projeto
-RUN npm install --production
+RUN npm install
 
 # Copie o restante dos arquivos do projeto para o diretório de trabalho do container
 COPY . .
 
 # Exponha a porta que a aplicação usará
-EXPOSE 8080
-
+EXPOSE 8080 
 # Defina uma variável de ambiente
 ENV NODE_ENV=production
 
